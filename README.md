@@ -7,7 +7,7 @@ gernerally export them.
 
 ## The Problem
 
-REDCap stores every data in plain in database
+REDCap stores every data in plaintext into databases
 
 ## What This Module Does
 
