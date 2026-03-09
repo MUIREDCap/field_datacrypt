@@ -104,10 +104,6 @@ The encryption classes (UnsafeCrypto and SaferCrypto) are based on code by [Scot
 
 ## Authors
 
-Kshitiz Pokhrel - Toronto Metropolitan University (kpokhrel@torontomu.ca)
-
-Ryan McRonald - University of Victoria (rmcronald@uvic.ca)
-
 Lalit Kaltenbach - Medical University of Innsbruck (redcap@i-med.ac.at)
 
 ## License
