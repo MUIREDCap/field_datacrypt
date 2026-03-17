@@ -9,7 +9,7 @@
         "institution": "Medical University of Innsbruck"
         }
     ],
-    "framework-version": 15,
+    "framework-version": 16,
     "compatibility":{
         "php-version-min":"7.4.0",
         "redcap-version-min":"16.1.4"
