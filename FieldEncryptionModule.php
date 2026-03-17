@@ -50,10 +50,12 @@ class FieldEncryptionModule extends AbstractExternalModule
         $fieldsToEncrypt = [];
         foreach ($dictionary as $fieldName => $fieldInfo) {
             $actionTags = $fieldInfo['field_annotation'] ?? '';
-            if (stripos($actionTags, '@DATACRYPT') !== false) {
+            $fieldType  = $fieldInfo['field_type'] ?? '';
+            if (stripos($actionTags, '@DATACRYPT') !== false && ($fieldType ==='text' || $fieldType === 'notes')) {
                 $fieldsToEncrypt[] = $fieldName;
             }
         }
+        
         return $fieldsToEncrypt;
     }
 
@@ -189,48 +191,8 @@ class FieldEncryptionModule extends AbstractExternalModule
             // Save the encrypted values back
             if (!empty($updatedData)) {
                 $saveData = [$record => [$event_id => $updatedData]];
-               
-                /* REDCap::saveData($parameter)
-                   https://redcap.i-med.ac.at/redcap_v16.1.5/Plugins/index.php?REDCapMethod=saveData 
-                    0: $project_id                  pid
-                    1: $dataFormat                  'array' (deflt), 'csv', 'json'
-                    2: $data                        the real data in form of $dataFormat
-                    3: $overwriteBehavior           'normal' (deflt), 'overwrite'
-                    4: $dateFormat                  'YMD' (deflt), 'MDY', 'DMY'
-          		    5: $type                        'flat' (deflt), 'eav' 
-                    6: $group_id                    null (deflt), DAG name or ID
-          		    7: $dataLogging                 true (deflt), false, null
-          		    8: $performAutoCalc             true (deflt), false, null
-          		    9: $commitData                  true (deflt), false => nothing will be written, just testing
-          		   10: $logAsAutoCalculations       false (deflt), true, null
-          		   11: $skipCalcFields              true (deflt), false, null
-          		   12: $changeReasons               array() (deflt), null
-                   13: $returnDataComparisonArray   false (deflt), true, null
-          		   14: $skipFileUploadFields        true (deflt), false, null
-          		   15: $removeLockedFields          false (deflt), true, null
-          		   16: $addingAutoNumberedRecords   false (deflt), true, null
-          		   17: $bypassPromisCheck           false (deflt), true, null
-          		   18: $csvDelimiter                User::getCsvDelimiter(), null
-          		   19: $bypassEconsentProtection    false (deflt), true, null
-          		   20: $loggingUser                 "" (deflt), null
-                   21: $async                       false (deflt), true, null
-                   22: $bypassRandomizationCheck    false (deflt), true, null
-          		   23: $bypassValidationCheck       false (deflt), true, null
-          		   24: $bypassLockingCheck          false (deflt), true, null
-          		   25: $bypassAlertAsiTrigger       false (deflt), true, null
-                */
                 
                 $result = \REDCap::saveData($project_id, 'array', $saveData, 'overwrite','YMD','flat',null,true,true,true,false,true,null,false,true,false,false,false,null,false,"",false,false,true,false,false);
-                
-                /* some debugging
-                $fd = fopen("/var/www/redcap-test/temp/test.txt","w");
-                fwrite($fd,implode(',',$updatedData)."\n");
-                fwrite($fd,json_encode($data)."\n");
-                fwrite($fd,json_encode($saveData)."\n");
-                fwrite($fd,json_encode($result)."\n");
-                fwrite($fd,$record);
-                fclose($fd);
-                */
 
                 if (empty($result['errors'])) {
                     $this->log("Encrypted fields saved", [
@@ -364,7 +326,6 @@ class FieldEncryptionModule extends AbstractExternalModule
                 
                 $value = $recordData[$fieldName];
                  
-                //if (empty($value) || strpos($value, 'ENC_')!==0) {
                 if (empty($value) || strpos($value, '#ENC#_')!==0) {
                     continue;
                 }
@@ -441,9 +402,11 @@ class FieldEncryptionModule extends AbstractExternalModule
      */
     public function createCSV($project_id) {
         global $app_title;
+        global $user_rights;
         $fieldsToEncrypt = $this->getFieldsToEncrypt($project_id);
         if (!empty($fieldsToEncrypt)) {
-            $data = \REDCap::getData($project_id,'array',null,$fieldsToEncrypt);
+            $group = ($user_rights['group_id']!==null) ? $user_rights['group_id'] : null; 
+            $data = \REDCap::getData($project_id,'array',null,$fieldsToEncrypt,null,$group);
             // FileName
             $basename = camelCase(html_entity_decode($app_title, ENT_QUOTES)) . "_DBCryptedValue_" . date("Y-m-d_Hi") . ".csv";
             $filename = $_SERVER['DOCUMENT_ROOT']."/temp/ENC_".$basename;
