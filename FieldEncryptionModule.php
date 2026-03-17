@@ -51,6 +51,7 @@ class FieldEncryptionModule extends AbstractExternalModule
         foreach ($dictionary as $fieldName => $fieldInfo) {
             $actionTags = $fieldInfo['field_annotation'] ?? '';
             $fieldType  = $fieldInfo['field_type'] ?? '';
+            // Only fields of type text (Textbox) or notes (Freetext) 
             if (stripos($actionTags, '@DATACRYPT') !== false && ($fieldType ==='text' || $fieldType === 'notes')) {
                 $fieldsToEncrypt[] = $fieldName;
             }
@@ -58,6 +59,57 @@ class FieldEncryptionModule extends AbstractExternalModule
         
         return $fieldsToEncrypt;
     }
+    
+    /**
+     * Looks up which fields have the @DATACRYPT action tag
+     * and check if user is allowed to export those fields
+     */
+    private function getFieldsToExport($project_id = null)
+    {
+        global $user_rights;
+        
+        $project_id = $project_id ?? $this->getProjectId();
+        $dictionary = \REDCap::getDataDictionary($project_id, 'array');
+
+        if (empty($dictionary)) {
+            return [];
+        }
+                
+        // Berechtigungen
+        foreach($user_rights['forms'] as $key=>$formname) {
+            $form_rights[$key] = $user_rights['forms_export'][$key];
+        }
+        
+        
+
+        $fieldsToExport = [];
+        foreach ($dictionary as $fieldName => $fieldInfo) {
+            $actionTags = $fieldInfo['field_annotation'] ?? '';
+            $fieldType  = $fieldInfo['field_type'] ?? '';
+            // Only fields of type text (Textbox) or notes (Freetext) 
+            if (stripos($actionTags, '@DATACRYPT') !== false && ($fieldType ==='text' || $fieldType === 'notes')) {
+                switch($form_rights[$fieldInfo['form_name']]) {
+                    case 0:         // no access
+                        break;
+                    case 1:         // full access
+                        $fieldsToExport[] = $fieldName;
+                        break;
+                    case 2:         // anonymous
+                        if($fieldInfo['identifier']!== 'y' && $fieldType !== 'notes') {
+                            $fieldsToExport[] = $fieldName;
+                        }     
+                        break;
+                    case 3:         // without identifer                    
+                        if($fieldInfo['identifier']!== 'y') {
+                            $fieldsToExport[] = $fieldName;
+                        }     
+                        break;                       
+                }
+            }
+        }
+        
+        return $fieldsToExport;
+    }    
 
     /**
      * Encrypts a value and formats it as a fake email address
@@ -403,7 +455,7 @@ class FieldEncryptionModule extends AbstractExternalModule
     public function createCSV($project_id) {
         global $app_title;
         global $user_rights;
-        $fieldsToEncrypt = $this->getFieldsToEncrypt($project_id);
+        $fieldsToEncrypt = $this->getFieldsToExport($project_id);
         if (!empty($fieldsToEncrypt)) {
             $group = ($user_rights['group_id']!==null) ? $user_rights['group_id'] : null; 
             $data = \REDCap::getData($project_id,'array',null,$fieldsToEncrypt,null,$group);
