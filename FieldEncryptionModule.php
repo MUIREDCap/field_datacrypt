@@ -384,14 +384,14 @@ class FieldEncryptionModule extends AbstractExternalModule
                
                 $updateValue = $this->decryptValue($value); 
                 
-                echo "
-                    var fieldName = '$fieldName';
-                    var escapedFieldName = fieldName.replace(/([!\"#$%&'()*+,.\\/:;<=>?@\\[\\]^`{|}~])/g, '\\\\$1');
-                    var field = $('input[name=\"' + escapedFieldName + '\"], textarea[name=\"' + escapedFieldName + '\"]');
-                    if (field.length && field.val()) {
-                        var currentValue = field.val().toString();
-                        field.val('$updateValue');
-                    }";
+                $output =  "var fieldName = '$fieldName';\n
+                            var escapedFieldName = fieldName.replace(/([!\"#$%&'()*+,.\\/:;<=>?@\\[\\]^`{|}~])/g, '\\\\$1');\n
+                            var field = $('input[name=\"' + escapedFieldName + '\"], textarea[name=\"' + escapedFieldName + '\"]');\n
+                            if (field.length && field.val()) {\n
+                                var currentValue = field.val().toString();\n
+                                field.val('$updateValue');\n
+                            }\n";
+                echo htmlentities($output);
             }               
             echo "</script>";    
                                  
@@ -471,7 +471,7 @@ class FieldEncryptionModule extends AbstractExternalModule
             // Begin writing
             $fp = fopen($filename,"w+");
             if($fp) {
-                fputcsv($fp,$header,";");
+                fputcsv($fp,$header,";","\"","\\","\n");
                 foreach($data as $key1=>$value1) {
                     foreach($value1 as $key2=>$value2) {
                         unset($row);
@@ -483,7 +483,7 @@ class FieldEncryptionModule extends AbstractExternalModule
                                 $row[] = "";
                             }
                         }
-                        fputcsv($fp,$row,";");
+                        fputcsv($fp,$row,";","\"","\\","\n");
                     }
                 }
                 fclose($fp);
