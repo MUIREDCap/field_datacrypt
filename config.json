@@ -1,55 +1,55 @@
 {
-    "name": "REDCap Field De/Encryption Module",
-    "namespace": "EPICENTER\\FieldEncryptionModule",
-    "description": "Encrypts sensitive field values (like email addresses) so they are stored crypted in the database. Supports longitudinal projects and surveys. Use @DATACRYPT action tag on fields to enable encryption.",
-    "authors": [
-        {
-        "name": "Lalit Kaltenbach",
-        "email": "redcap@i-med.ac.at",
-        "institution": "Medical University of Innsbruck"
-        }
-    ],
-    "framework-version": 16,
-    "compatibility":{
-        "php-version-min":"7.4.0",
-        "redcap-version-min":"16.1.4"
+  "name": "REDCap Field De/Encryption Module",
+  "namespace": "EPICENTER\\FieldEncryptionModule",
+  "description": "Encrypts sensitive field values (like email addresses) so they are stored crypted in the database. Supports longitudinal projects and surveys. Use @DATACRYPT action tag on fields to enable encryption.",
+  "authors": [
+    {
+      "name": "Lalit Kaltenbach",
+      "email": "redcap@i-med.ac.at",
+      "institution": "Institute of Clinical Epidemiology, Public Health, Health Economics, Medical Statistics and Informatics (EPICENTER)"
+    }
+  ],
+  "framework-version": 16,
+  "compatibility": {
+    "php-version-min": "7.4.0",
+    "redcap-version-min": "16.1.4"
+  },
+  "system-settings": [
+    {
+      "key": "encryption-key",
+      "name": "Master Encryption Key",
+      "type": "text",
+      "required": true
+    }
+  ],
+  "hooks": [
+    {
+      "hook": "redcap_save_record",
+      "description": "Encrypt fields after record save"
     },
-    "system-settings":[
-        {
-            "key":"encryption-key",
-            "name":"Master Encryption Key",
-            "type":"text",
-            "required":true
-        }
-    ],
-    "hooks": [
-        {
-            "hook": "redcap_save_record",
-            "description": "Encrypt fields after record save"
-        },
-        {
-            "hook": "redcap_survey_complete",
-            "description": "Encrypt fields after survey completion"
-        },
-        {
-            "hook": "redcap_data_entry_form",
-            "description": "Show Decrypted values in data entry forms"
-        },
-        {
-            "hook": "redcap_data_entry_form_top",
-            "description": "Show privacy notice on forms"
-        },
-        {
-            "hook": "redcap_survey_page",
-            "description": "Show Decrypted values on survey pages"
-        },
-        {
-            "hook": "redcap_every_page_top",
-            "description": "Show download option of decrypted fields with record id, as the data are in a normal export encrypted! Identificationlist as CSV"
-        },
-        {
-            "hook": "redcap_report_data",
-            "description": "Show Decrypted values in reports"
-        }
-    ]
+    {
+      "hook": "redcap_survey_complete",
+      "description": "Encrypt fields after survey completion"
+    },
+    {
+      "hook": "redcap_data_entry_form",
+      "description": "Show Decrypted values in data entry forms"
+    },
+    {
+      "hook": "redcap_data_entry_form_top",
+      "description": "Show privacy notice on forms"
+    },
+    {
+      "hook": "redcap_survey_page",
+      "description": "Show Decrypted values on survey pages"
+    },
+    {
+      "hook": "redcap_every_page_top",
+      "description": "Show download option of decrypted fields with record id, as the data are in a normal export encrypted! Identificationlist as CSV"
+    },
+    {
+      "hook": "redcap_report_data",
+      "description": "Show Decrypted values in reports"
+    }
+  ]
 }
