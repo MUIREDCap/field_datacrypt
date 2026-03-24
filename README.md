@@ -106,13 +106,13 @@ The encryption classes (UnsafeCrypto and SaferCrypto) are based on code by [Scot
 **Field not encrypting:** Verify `@DATACRYPT` is in the field's action tags. Check EM logs for "Could not fetch record data" which indicates an event/instrument mismatch.
 
 **Offering** wrong file for download instead of csv. Check if webserver is allowed to write to the {REDCAP-ROOT}/temp directory and if you are allowed to read files over the
-  Webbrowser from the folder {REDCAP-ROOT}/temp (.htaccess with "Require all denied" would block, solution: add
-  --- .htaccess ---
+  Webbrowser from the folder {REDCAP-ROOT}/temp (.htaccess with "Require all denied" would block, solution: add .htaccess file to the {REDCAP-ROOT}/temp:
+
   Require all denied
   <FilesMatch "^ENC_.*\.csv$">
      Require all granted
   </FilesMatch>
-  -----------------
+
   Rights: root:www-data or apache, 640 => rw-r-----  
 
 ## Authors
