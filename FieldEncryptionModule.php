@@ -69,11 +69,11 @@ class FieldEncryptionModule extends AbstractExternalModule
     {
         global $user_rights;
         global $lang;
-        if($lang['fieldencryption_7']=="" && $lang['fieldencryption_8']=="" && $lang['fieldencryption_9']=="" && $lang['fieldencryption_10']=="") {
-            $lang['fieldencryption_7'] = "NO export rights";
-            $lang['fieldencryption_8'] = "Full export rights";
-            $lang['fieldencryption_9'] = "Export De-Identified";
-            $lang['fieldencryption_10'] = "Export without Identifer fields";
+        if($lang['fieldencryption_8']=="" && $lang['fieldencryption_9']=="" && $lang['fieldencryption_10']=="" && $lang['fieldencryption_11']=="") {
+            $lang['fieldencryption_8'] = "NO export rights";
+            $lang['fieldencryption_9'] = "Full export rights";
+            $lang['fieldencryption_10'] = "Export De-Identified";
+            $lang['fieldencryption_11'] = "Export without Identifer fields";
         }        
         $project_id = $project_id ?? $this->getProjectId();
         $dictionary = \REDCap::getDataDictionary($project_id, 'array');
@@ -88,16 +88,16 @@ class FieldEncryptionModule extends AbstractExternalModule
             $form_rights[$key] = $user_rights['forms_export'][$key];
             switch($user_rights['forms_export'][$key]) {
                 case 0: 
-                    self::$exportFeedback .= "<u>".$key."</u><br><ul><li><font color='red'><b>".$lang['fieldencryption_7']."</b></font></li></ul>"; 
+                    self::$exportFeedback .= "<u>".$key."</u><br><ul><li><font color='red'><b>".$lang['fieldencryption_8']."</b></font></li></ul>"; 
                     break;
                 case 1:
-                    self::$exportFeedback .= "<u>".$key."</u><br><ul><li><font color='green'><b>".$lang['fieldencryption_8']."</b></font></li></ul>";
+                    self::$exportFeedback .= "<u>".$key."</u><br><ul><li><font color='green'><b>".$lang['fieldencryption_9']."</b></font></li></ul>";
                     break;
                 case 2:
-                    self::$exportFeedback .= "<u>".$key."</u><br><ul><li>( ".$lang['fieldencryption_9']." )</li></ul>";
+                    self::$exportFeedback .= "<u>".$key."</u><br><ul><li>( ".$lang['fieldencryption_10']." )</li></ul>";
                     break;                
                 case 3:
-                    self::$exportFeedback .= "<u>".$key."</u><br><ul><li>".$lang['fieldencryption_10']." )</li></ul>";
+                    self::$exportFeedback .= "<u>".$key."</u><br><ul><li>".$lang['fieldencryption_11']." )</li></ul>";
                     break;
             }
         }
