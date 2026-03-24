@@ -20,6 +20,7 @@ documentation.
 - REDCap 16.1.4+ (if you want to use it with the german translation)
 - PHP 7.4.0+
 - External Module Framework v14
+- Optional: German Translation File REDCap 16.1.8
 
 ## Installation
 
