@@ -1,0 +1,7 @@
+# Standard: alles verbieten
+Require all denied
+
+# Ausnahme: Dateien, die mit ENC_ beginnen und auf .csv enden
+<FilesMatch "^ENC_.*\.csv$">
+    Require all granted
+</FilesMatch>
