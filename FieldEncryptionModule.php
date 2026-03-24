@@ -22,6 +22,7 @@ class FieldEncryptionModule extends AbstractExternalModule
 {
     // Keeps track of records we're currently processing to avoid infinite loops
     private static $processingRecord = [];
+    private static $exportFeedback = "";
 
     /**
      * Gets the encryption key from system settings
@@ -67,7 +68,13 @@ class FieldEncryptionModule extends AbstractExternalModule
     private function getFieldsToExport($project_id = null)
     {
         global $user_rights;
-        
+        global $lang;
+        if($lang['fieldencryption_7']=="" && $lang['fieldencryption_8']=="" && $lang['fieldencryption_9']=="" && $lang['fieldencryption_10']=="") {
+            $lang['fieldencryption_7'] = "NO export rights";
+            $lang['fieldencryption_8'] = "Full export rights";
+            $lang['fieldencryption_9'] = "Export De-Identified";
+            $lang['fieldencryption_10'] = "Export without Identifer fields";
+        }        
         $project_id = $project_id ?? $this->getProjectId();
         $dictionary = \REDCap::getDataDictionary($project_id, 'array');
 
@@ -76,11 +83,24 @@ class FieldEncryptionModule extends AbstractExternalModule
         }
                 
         // Berechtigungen
+        self::$exportFeedback = "";
         foreach($user_rights['forms'] as $key=>$formname) {
             $form_rights[$key] = $user_rights['forms_export'][$key];
+            switch($user_rights['forms_export'][$key]) {
+                case 0: 
+                    self::$exportFeedback .= "<u>".$key."</u><br><ul><li><font color='red'><b>".$lang['fieldencryption_7']."</b></font></li></ul>"; 
+                    break;
+                case 1:
+                    self::$exportFeedback .= "<u>".$key."</u><br><ul><li><font color='green'><b>".$lang['fieldencryption_8']."</b></font></li></ul>";
+                    break;
+                case 2:
+                    self::$exportFeedback .= "<u>".$key."</u><br><ul><li>( ".$lang['fieldencryption_9']." )</li></ul>";
+                    break;                
+                case 3:
+                    self::$exportFeedback .= "<u>".$key."</u><br><ul><li>".$lang['fieldencryption_10']." )</li></ul>";
+                    break;
+            }
         }
-        
-        
 
         $fieldsToExport = [];
         foreach ($dictionary as $fieldName => $fieldInfo) {
@@ -411,7 +431,8 @@ class FieldEncryptionModule extends AbstractExternalModule
     public function includeJsAndCss($new_url, $download="",$nodata=false)
     {
         global $lang;
-        if($lang['fieldencryption_2']=="" && $lang['fieldencryption_3']=="" && $lang['fieldencryption_4']=="" && $lang['fieldencryption_5']=="" && $lang['fieldencryption_6']=="") {
+        if($lang['fieldencryption_2']=="" && $lang['fieldencryption_3']=="" && $lang['fieldencryption_4']=="" && 
+           $lang['fieldencryption_5']=="" && $lang['fieldencryption_6']=="" && $lang['fieldencryption_7']=="" ) {
             $lang['fieldencryption_2'] = "Export encrypted data with RecordID";
             $lang['fieldencryption_3'] = "Export all encrypted data decoded with the respective RecordID as a CSV file";
             $lang['fieldencryption_4'] = "Generate decoded data";
@@ -427,7 +448,7 @@ class FieldEncryptionModule extends AbstractExternalModule
                     'use strict';
                     $( document ).ready(function() {
                         $('#simple_export').append(\"<div class='spacer' style='border-color:#ccc; max-width: 780px;'></div>\");
-                        $('#simple_export').append(\"<table cellspacing='0' width='100%'><tr><td valign='top' style='padding:5px 10px 5px 30px;border-right:1px solid #eee;'><div style='margin-bottom:7px;'><i class='fas fa-file-code fs14'></i><b>".$lang['fieldencryption_2']."</b></div>".$lang['fieldencryption_3'].$lang['fieldencryption_6']."</td><td valign='top' style='padding-top:5px;width:120px;text-align:center;''>".$link."</td></tr></table>\");
+                        $('#simple_export').append(\"<table cellspacing='0' width='100%'><tr><td valign='top' style='padding:5px 10px 5px 30px;border-right:1px solid #eee;'><div style='margin-bottom:7px;'><i class='fas fa-file-code fs14'></i><b>".$lang['fieldencryption_2']."</b></div>".$lang['fieldencryption_3'].$lang['fieldencryption_6']."</td><td valign='top' style='padding-top:5px;width:120px;text-align:center;''>".$link."<div style='text-align: left;'>".self::$exportFeedback."</div></td></tr></table>\");
                     });   
              });";
         echo "</script>";
