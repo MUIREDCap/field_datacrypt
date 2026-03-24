@@ -109,8 +109,11 @@ The encryption classes (UnsafeCrypto and SaferCrypto) are based on code by [Scot
   Webbrowser from the folder {REDCAP-ROOT}/temp (.htaccess with "Require all denied" would block, solution: add .htaccess file to the {REDCAP-ROOT}/temp:
 
   Require all denied
+  
   <FilesMatch "^ENC_.*\.csv$">
+  
      Require all granted
+     
   </FilesMatch>
 
   Rights: root:www-data or apache, 640 => rw-r-----  
