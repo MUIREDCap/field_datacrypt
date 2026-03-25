@@ -9,7 +9,7 @@ REDCap stores every data in plaintext into databases
 
 ## What This Module Does
 
-When a user or a participant enters personal data, the module immediatly encrypts it and saves it back to the database in a format like `#ENC#_...`. 
+When a user or a participant enters personal data, the module encrypts it during the saving process into the database in a format like `#ENC#_...`. 
 Those personal data are crypted if you export the data anyway. If you load a form or generate a report those data are shown decrypted. Also is in
 the tab under `Other export options` at the end a new possibility to export all crypted data with the refering [record_id] as a csv-file for separate
 documentation. 
@@ -20,6 +20,7 @@ documentation.
 - REDCap 16.1.4+ (if you want to use it with the german translation)
 - PHP 7.4.0+
 - External Module Framework v14
+- Optional: German Translation File REDCap 16.1.8
 
 ## Installation
 
@@ -34,7 +35,8 @@ documentation.
 
 ## Usage
 
-Add `@DATACRYPT` to any field's action tags. That field will be encrypted on save.
+Add `@DATACRYPT` to field's action tags. That field will be encrypted on save. Only Textboxes and Noteboxes
+are affected by this action tag! If you use it on other field types, nothing would happen
 
 ## De-/Encryption
 
@@ -70,8 +72,10 @@ The encryption classes (UnsafeCrypto and SaferCrypto) are based on code by [Scot
   Step 2: Press the Excel-Icon vor downloading the csv-file
   .. if there are no data available (means you didn't use @DATACRYPT-Action-Tag in your project)
   A message tells you that no data are available for export
+- The Script takes in account the users rights on exporting data  
 - The created export-files (csv) are removed at the end of the hour within the files are generated on the server
   which would be done by the cronjob and the "FieldEncryptionModule.sh"
+- The export-file will be saved in the {REDCAP-ROOT}/temp directory  
 
 ## Files
 
@@ -84,6 +88,7 @@ The encryption classes (UnsafeCrypto and SaferCrypto) are based on code by [Scot
 | `SaferCrypto.php` | Authenticated encryption (encrypt-then-MAC) |
 | `UnsafeCrypto.php` | AES-256-CTR encryption |
 | `config.json` | Module settings, hooks, cron definition |
+| `.htaccess` | Example access control for {REDCAP_ROOT}/temp/ directory |
 
 ## Security Notes
 
@@ -91,7 +96,6 @@ The encryption classes (UnsafeCrypto and SaferCrypto) are based on code by [Scot
 - SQL queries use parameterized statements via `$module->query()`
 - JavaScript is wrapped in an IIFE to avoid global scope pollution
 - Field names are JSON-encoded with `JSON_HEX_*` flags to prevent XSS
-- Survey links in emails are escaped with `REDCap::escapeHtml()`
 
 ## Limitations
 
@@ -101,7 +105,18 @@ The encryption classes (UnsafeCrypto and SaferCrypto) are based on code by [Scot
 
 **Field not encrypting:** Verify `@DATACRYPT` is in the field's action tags. Check EM logs for "Could not fetch record data" which indicates an event/instrument mismatch.
 
-**Still seeing encrypted string instead of [DECRYPTED VALUES]:** Browser might be blocking JavaScript. Check console for errors.
+**Offering** html file for download instead of csv. Check if webserver is allowed to write to the {REDCAP-ROOT}/temp directory and if you are allowed to read files over the
+  Webbrowser from the folder {REDCAP-ROOT}/temp (.htaccess with "Require all denied" would block, solution: add .htaccess file to the {REDCAP-ROOT}/temp:
+
+  Require all denied
+  
+  <FilesMatch "^ENC_.*\.csv$">
+  
+     Require all granted
+     
+  </ FilesMatch>    .. without space after </
+
+  Rights: root:www-data or apache, 640 => rw-r-----  
 
 ## Authors
 
