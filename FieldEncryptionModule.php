@@ -57,6 +57,7 @@ class FieldEncryptionModule extends AbstractExternalModule
                 $fieldsToEncrypt[] = $fieldName;
             }
         }
+        
         return $fieldsToEncrypt;
     }
     
@@ -388,6 +389,7 @@ class FieldEncryptionModule extends AbstractExternalModule
 
             $recordData = $data[$record][$event_id];
             
+            $output = "";
             foreach ($fieldsToEncrypt as $fieldName) {
                 if (!isset($recordData[$fieldName])) {
                     continue;
@@ -401,7 +403,7 @@ class FieldEncryptionModule extends AbstractExternalModule
                
                 $updateValue = $this->decryptValue($value); 
                 
-                $output =  "var fieldName = '$fieldName';\n
+                $output .=  "var fieldName = '$fieldName';\n
                             var escapedFieldName = fieldName.replace(/([!\"#$%&'()*+,.\\/:;<=>?@\\[\\]^`{|}~])/g, '\\\\$1');\n
                             var field = $('input[name=\"' + escapedFieldName + '\"], textarea[name=\"' + escapedFieldName + '\"]');\n
                             if (field.length && field.val()) {\n
@@ -409,7 +411,7 @@ class FieldEncryptionModule extends AbstractExternalModule
                                 field.val('$updateValue');\n
                             }\n";
             }               
-            echo "<script type='text/javascript'>".$output."</script>";    
+            echo "<script type='text/javascript'>$output</script>";    
                                  
         } catch (\Exception $e) {
             $this->log("Encryption error", [
