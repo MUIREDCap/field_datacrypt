@@ -6,7 +6,7 @@
     {
       "name": "Lalit Kaltenbach",
       "email": "redcap@i-med.ac.at",
-      "institution": "Institute of Clinical Epidemiology, Public Health, Health Economics, Medical Statistics and Informatics (EPICENTER)"
+      "institution": "Institute of Clinical Epidemiology, Public Health, Health Economics, Medical Statistics and Informatics"
     }
   ],
   "framework-version": 16,
@@ -20,6 +20,12 @@
       "name": "Master Encryption Key",
       "type": "text",
       "required": true
+    }
+  ],
+  "action-tags": [
+    {
+      "tag": "@DATACRYPT",
+      "description": "This action tag enables saving values crypted to database.<p><code>@DATACRYPT</code></p><p>The action tag is available for text and notes boxes only. Fields of other types are ignored.</p>"
     }
   ],
   "hooks": [
