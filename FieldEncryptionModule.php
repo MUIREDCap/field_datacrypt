@@ -7,23 +7,26 @@ require_once __DIR__ . '/UnsafeCrypto.php';
 require_once __DIR__ . '/SaferCrypto.php';
 
 /**
- * Field Encryption Module for REDCap
+ * Field De/Encryption Module for REDCap
  *
  * Encrypts fields tagged with @DATACRYPT. Fields get stored as #ENC#_[base64]
- * created by 
+ * based on  REDCap Field Encryption Module - v1.0.0 created by
  * @author Kshitiz Pokhrel <kpokhrel@torontomu.ca>
  * @author Ryan McRonald <rmcronald@uvic.ca>
  * REDCap Field Encryption Module
  * https://github.com/kpinsights/field_encryption_module_v1.0.0
- * modified by
+ * modified and extended by
  * @author Lalit Kaltenbach <redcap@i-med.ac.at>
  */
+
+
+
 class FieldEncryptionModule extends AbstractExternalModule
 {
     // Keeps track of records we're currently processing to avoid infinite loops
     private static $processingRecord = [];
     private static $exportFeedback = "";
-
+    
     /**
      * Gets the encryption key from system settings
      */
@@ -480,7 +483,7 @@ class FieldEncryptionModule extends AbstractExternalModule
             $data = \REDCap::getData($project_id,'array',null,$fieldsToEncrypt,null,$group);
             // FileName
             $basename = camelCase(html_entity_decode($app_title, ENT_QUOTES)) . "_DBCryptedValue_" . date("Y-m-d_Hi") . ".csv";
-            $filename = $_SERVER['DOCUMENT_ROOT']."/temp/ENC_".$basename;
+            $filename = APP_PATH_TEMP."ENC_".$basename;
             $download = 'https://' . $_SERVER['HTTP_HOST'] ."/temp/ENC_".$basename;
             // Create Header
             $header[] = "RecordID";
@@ -515,7 +518,7 @@ class FieldEncryptionModule extends AbstractExternalModule
             $this->includeJsAndCss("","",true);    
         }
     }
-    
+       
     /**
      * Hook: masks encrypted values in reports
      */
